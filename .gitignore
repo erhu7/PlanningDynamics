@@ -27,6 +27,7 @@ results/
 output/
 data/
 additional_analyses/
+build/
 
 # OS files
 .DS_Store
