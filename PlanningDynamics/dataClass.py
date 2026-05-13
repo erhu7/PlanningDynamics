@@ -2,6 +2,7 @@ from PlanningDynamics import utils, graph
 import numpy as np
 import pynwb
 from tqdm import tqdm
+import os
 
 from collections import namedtuple
 
@@ -97,7 +98,11 @@ def get_fixation_table(nwbfile):
 class nwbWrapper:
     def __init__(self, fname, region, to_load="all", choice_query="(trialerror == 0)"):
         self.fname = fname
+        if not os.path.exists(fname):
+            raise FileNotFoundError(f'{fname} is not found')
         self.region = region
+        if region not in ['OFC','HPC']:
+            raise ValueError(f'region should be either OFC or HPC. Your region is: {region}')
         self.choice_query = choice_query
         if to_load not in ["all", "bhv"]:
             raise ValueError("to_load must be 'all' or 'trial_df'")
@@ -168,8 +173,8 @@ class nwbWrapper:
                 if len(fixes_for_step) == 1:
                     row = fixes.iloc[fixes_for_step]
                     
-                    fix_on[step_idx] = int(row.t_on.values)
-                    fix_off[step_idx] = int(row.t_off.values)
+                    fix_on[step_idx] = int(row.t_on.values[0])
+                    fix_off[step_idx] = int(row.t_off.values[0])
                     
                 elif len(fixes_for_step) == 2:
                     n_unique = lambda x: len(np.unique(x))
@@ -182,8 +187,8 @@ class nwbWrapper:
                         # Different nodes
                         node = step.node
                         fix_to_keep = fixes_for_step[np.where(fixes.iloc[fixes_for_step].fix_node.values == node)[0]]
-                        fix_on[step_idx] = int(fixes.iloc[fix_to_keep].t_on.values)
-                        fix_off[step_idx] = int(fixes.iloc[fix_to_keep].t_off.values)
+                        fix_on[step_idx] = int(fixes.iloc[fix_to_keep].t_on.values[0])
+                        fix_off[step_idx] = int(fixes.iloc[fix_to_keep].t_off.values[0])
                 else:
                     fix_on[step_idx] = int(step.t_on)
                     fix_off[step_idx] = int(step.t_on) + 300
@@ -250,7 +255,7 @@ class nwbWrapper:
 
 
 if __name__ == "__main__":
-    fname = "/media/eric/partition_1/PlanningDynamics/data/london/London_TeleWorld_4x4_101124_spikes.nwb"
+    fname = "/Volumes/Neuro/WallisLab/rotation_EricPlanning/PlanningDynamics/data/london/London_TeleWorld_4x4_101124_spikes.nwb"
     region = "OFC"
     nwb = nwbWrapper(fname, region)
     print(nwb.unitNames)

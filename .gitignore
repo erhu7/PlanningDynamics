@@ -27,7 +27,6 @@ results/
 output/
 data/
 additional_analyses/
-build/
 
 # OS files
 .DS_Store
@@ -35,3 +34,9 @@ Thumbs.db
 
 # VS Code settings
 .vscode/
+
+# Project specific
+tutorial.ipynb
+tutorial2.ipynb
+build/
+*.pkl
